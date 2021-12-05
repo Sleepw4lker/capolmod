@@ -1,0 +1,37 @@
+import "wtypes.idl";
+import "certpol.idl";
+import "certmod.idl";
+
+
+//+--------------------------------------------------------------------------
+// certpol Type library
+//+--------------------------------------------------------------------------
+
+[
+    uuid(022A7140-C73F-4AE3-BB05-344E227CDFBF),
+    version(1.0),
+    helpstring("CertPolicyShim 1.0 Type Library")
+]
+
+library CERTPOLICYSHIMLib
+{
+    importlib("stdole2.tlb");
+
+    [
+	uuid(022A7141-C73F-4AE3-BB05-344E227CDFBF),
+	helpstring("CertPolicyShim Class")
+    ]
+    coclass CCertPolicyShim
+    {
+	[default] interface ICertPolicy2;
+    };
+
+    [
+	uuid(022A7142-C73F-4AE3-BB05-344E227CDFBF),
+	helpstring("CertManagePolicyModuleShim Class")
+    ]
+    coclass CCertManagePolicyModuleShim
+    {
+	[default] interface ICertManageModule;
+    };
+};

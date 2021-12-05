@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define ProductVersion="1.0.2.0" ?>
+  <?define UpgradeCode="4C2CD27E-E136-44BC-86DF-3862F3F10058" ?>
+  <?define ProductName="Shim Policy Module" ?>
+  
+	<Product Id="*" 
+           Name="$(var.ProductName)" 
+           Language="1033" 
+           Version="$(var.ProductVersion)" 
+           Manufacturer="JW Secure, Inc." 
+           UpgradeCode="$(var.UpgradeCode)">
+
+    <Package 
+      Description="$(var.ProductName)"
+      InstallPrivileges="elevated"
+      InstallerVersion="200" 
+      InstallScope="perMachine"
+      Compressed="yes" />
+
+    <Upgrade Id="$(var.UpgradeCode)">
+      <UpgradeVersion 
+        OnlyDetect="no" 
+        Property="PREVIOUSFOUND" 
+        Minimum="1.0.0.0" 
+        IncludeMinimum="yes"
+        Maximum="$(var.ProductVersion)" 
+        IncludeMaximum="no" />
+      <UpgradeVersion 
+        OnlyDetect="yes" 
+        Property="NEWERFOUND" 
+        Minimum="$(var.ProductVersion)" 
+        IncludeMinimum="no"/>
+    </Upgrade>
+
+    <Condition Message="$(var.ProductName) only runs on Windows Server 2008 R2 or later.">
+      Installed OR (VersionNT>=601 AND MsiNTProductType>1)
+    </Condition>
+    <Condition Message="This package requires 64-bit Windows.">
+      VersionNT64
+    </Condition>
+    <Condition Message="You need to be an administrator to install $(var.ProductName).">
+      Privileged
+    </Condition>
+
+    <WixVariable Id="WixUIBannerBmp" Value="JWSecure_MSI_LogoTop.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="JWSecure_MSI_LeftHand.bmp" />
+
+    <UI>
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" Red="255" Blue="255" Green="255"/>
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="Minimal" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+      <Property Id="ARPNOMODIFY" Value="1" />
+      <UIRef Id="WixUI_Common" />
+    </UI>
+    
+		<Media Id="1" Cabinet="JWSecureCertPShim.cab" EmbedCab="yes" />
+    
+    <Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="System64Folder">      
+        <Component Id="PolMod" Guid="0111989D-78A1-4937-8AF1-F7B4F81C3D34">
+          <File Name="CerPShim.dll" Source="$(var.bin)\CerPShim.dll" SelfRegCost ="0" Id ="CerPShim.dll" Vital ="yes"/>
+          <Util:EventSource
+              xmlns:Util="http://schemas.microsoft.com/wix/UtilExtension"
+              Name="Shim-PolicyModule-JWSecure"
+              Log="Shim-PolicyModule-JWSecure"
+              EventMessageFile="[#CerPShim.dll]"/>
+        </Component>
+			</Directory>
+		</Directory>
+
+		<Feature Id="ProductFeature" Title="CaPolMod" Level="1">
+      <ComponentRef Id="PolMod" />
+		</Feature>
+
+    <CustomAction
+      Id="NoDowngrade"
+      Error="A newer version of $(var.ProductName) is already installed." />
+        
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallInitialize" />
+      <Custom Action="NoDowngrade" After="FindRelatedProducts">NEWERFOUND</Custom>
+    </InstallExecuteSequence>
+          
+	</Product>
+</Wix>
