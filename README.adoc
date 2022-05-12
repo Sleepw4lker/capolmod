@@ -2,4 +2,4 @@
 
 This Certificate Authority Policy Module shims the builtin Windows policy module. This approach allows you to selectively apply additional checks without having to reproduce the original logic which is complex.
 
-NOTE: This is a mirror of the project formerly hosted on Codeplex. I've ported the underlying logic to C#, see link:https://github.com/Sleepw4lker/AdcsSamplePolicyModule[AdcsSamplePolicyModule].
+NOTE: This is a mirror of the project formerly published by Microsoft on Codeplex. I've ported the underlying logic to C#, see my link:https://github.com/Sleepw4lker/TameMyCerts[TameMyCerts] project.
